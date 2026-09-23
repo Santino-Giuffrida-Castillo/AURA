@@ -5,5 +5,3 @@ struct Brick
 	double y;
 
 };
-
-void moveBrick(Brick& brick);
