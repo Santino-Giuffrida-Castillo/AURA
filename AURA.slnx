@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="AURA/AURA.vcxproj" />
+  <Project Path="AURA/AURA.vcxproj" Id="4808188a-7c52-4924-86eb-052fd8201aca" />
 </Solution>
