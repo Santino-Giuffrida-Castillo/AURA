@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Ball.h" />
     <ClInclude Include="..\src\Brick.h" />
+    <ClInclude Include="..\src\Consts.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Player.h" />
   </ItemGroup>

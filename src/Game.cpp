@@ -6,7 +6,7 @@ void playGame()
 
 }
 
-void checkBrickBallCollisions()
+void checkCollisions(Brick& brick, Ball& ball, Player& player)
 {
 
 }

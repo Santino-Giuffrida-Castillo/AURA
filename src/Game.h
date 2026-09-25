@@ -1,4 +1,8 @@
 #pragma once
+#include "Ball.h"
+#include "Brick.h"
+#include "Player.h"
+#include "Consts.h"
 #include <string>
 
 const int MAX_FOTOGRAMS = 200;
@@ -19,7 +23,7 @@ struct VideoManager {
 };
 
 void playGame();
-void checkBrickBallCollisions();
+void checkCollisions(Brick& brick, Ball& ball, Player& player);
 void advanceFrameVideo(VideoMeme& video);
 void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::string folderPrefix);
 void playVideo(VideoMeme& video);
