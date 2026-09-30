@@ -1,10 +1,12 @@
 #include <sl.h>
 #include "Game.h" 
+#include "Skins.h"
+#include <time.h>
 
 int main()
 {
 
-
+    srand(time(NULL));
     slWindow(WIDTH, HEIGHT, "Brick Breaker + Meme Player", false);
 
     //// Instanciamos el manager que contiene tus dos videos reales
@@ -18,6 +20,7 @@ int main()
     player = initPlayer();
     ball = initBall();
     fillRow(bricks);
+    putSkin(bricks, heartSkin);
     while (!slShouldClose() && !slGetKey(SL_KEY_ESCAPE))
     {
         // Fondo por defecto
@@ -25,12 +28,14 @@ int main()
 
 
         movePlayer(player);
-
-
+        moveBall(ball);
+        checkCollisions(bricks, ball, player);
+        checkIfBallIsOut(ball, player);
+        checkPlayerLives(player);
         drawPlayer(player);
         drawBall(ball);
         drawBricks(bricks, brickAmount);
-
+        
         slSetForeColor(0.0, 0.0, 0.0, 1.0);
         // Esta sola función de Game.cpp controla el Enter, el Tab, el audio y dibuja los frames
         /*controlAndDrawVideos(misVideos, width, height);*/

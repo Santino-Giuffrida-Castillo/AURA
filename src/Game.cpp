@@ -6,9 +6,179 @@ void playGame()
 
 }
 
-void checkCollisions(Brick& brick, Ball& ball, Player& player)
+void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player)
 {
+    bool collision = false;
+    bool touchUp = false;
+    bool tochDown = false;
+    bool touchUpperLefth = false;
+    bool touchUpperRight = false;
+    bool touchDownLefth = false;
+    bool touchDownrRight = false;
+    double penetrationLefth;
+    double penetrationRight;
+    double penetrationTop;
+    double penetrationBottom;
+    double minX;
+    double minY;
 
+    for (int i = 0; i < brickAmount; i++)
+    {
+        if (collision)
+        {
+            break;
+        }
+        for (int j = 0; j < brickAmount; j++)
+        {
+            if (bricks[i][j].active && !collision)
+            {
+
+                    //Se superpone en y?
+                    if (ball.bottom <= bricks[i][j].top && ball.top >= bricks[i][j].bottom)
+                    {
+                        //Se superpone en x?
+                        if (ball.left <= bricks[i][j].right && ball.right >= bricks[i][j].left)
+                        {
+                            std::cout << "choque" << std::endl;
+                            penetrationLefth = ball.right - bricks[i][j].left;
+                            penetrationRight = bricks[i][j].right - ball.left;
+                            penetrationTop = bricks[i][j].top - ball.bottom;
+                            penetrationBottom = ball.top - bricks[i][j].bottom;
+                                if (penetrationLefth > penetrationRight)
+                                {
+                                 minX = penetrationRight;
+                                }
+                                else
+                                {
+                                 minX = penetrationLefth;
+                                }
+
+                                if (penetrationTop > penetrationBottom)
+                                {
+                                 minY = penetrationBottom;
+                                }
+                                else
+                                {
+                                 minY = penetrationTop;
+                                }
+
+
+                                if (minX > minY)
+                                {
+
+                                    if (ball.velY > 0)
+                                    {
+                                        ball.y -= penetrationBottom;
+                                    }
+                                    else if (ball.velY < 0)
+                                    {
+                                        ball.y += penetrationTop;
+                                    }
+
+                                    ball.velY = -ball.velY;
+                                }
+                                else if (minX < minY)
+                                {
+
+                                    if (ball.velX > 0)
+                                    {
+                                        ball.x -= penetrationLefth;
+                                    }
+                                    else if (ball.velX < 0)
+                                    {
+                                        ball.x += penetrationRight;
+                                    }
+
+                                    ball.velX = -ball.velX;
+                                }
+                                else
+                                {
+                                    if (ball.velX > 0)
+                                    {
+                                        ball.x -= penetrationLefth;
+                                    }
+                                    else if (ball.velX < 0)
+                                    {
+                                        ball.x += penetrationRight;
+                                    }
+
+                                    if (ball.velY > 0)
+                                    {
+                                        ball.y -= penetrationBottom;
+                                    }
+                                    else if (ball.velY < 0)
+                                    {
+                                        ball.y += penetrationTop;
+                                    }
+
+                                    ball.velX *= -1;
+                                    ball.velY *= -1;
+                                }
+
+                                bricks[i][j].active = false;
+                                collision = true;
+
+                                ball.left = ball.x - ball.width / 2;
+                                ball.right = ball.x + ball.width / 2;
+                                ball.bottom = ball.y - ball.height / 2;
+                                ball.top = ball.y + ball.height / 2;
+                        }
+                    }
+            }
+        }
+    }
+
+    if (ball.left < SCREEN_LEFTH)
+    {
+        ball.velX *= -1;
+
+    }
+    else if (ball.right > WIDTH)
+    {
+        ball.velX *= -1;
+
+    }
+    else if (ball.top > HEIGHT)
+    {
+
+        ball.velY *= -1;
+    }
+
+    if (ball.bottom <= player.top && ball.top >= player.bottom)
+    {
+        if (ball.left <= player.right && ball.right >= player.left)
+        {
+            ball.y = player.top + ball.height / 2;
+            ball.velY *= -1;
+
+            ball.bottom = ball.y - ball.height / 2;
+            ball.top = ball.y + ball.height / 2;
+        }
+    }
+
+    ball.left = ball.x - ball.width / 2;
+    ball.right = ball.x + ball.width / 2;
+    ball.bottom = ball.y - ball.height / 2;
+    ball.top = ball.y + ball.height / 2;
+
+
+}
+
+void checkPlayerLives(Player& player)
+{
+    if (player.lives == 0)
+    {
+        std::cout << "Perdiste" << std::endl;
+    }
+}
+
+void checkIfBallIsOut(Ball& ball, Player& player)
+{
+  if (ball.bottom < SCREEN_BOTTOM)
+  {
+      ball = initBall();
+      player.lives--;
+  }
 }
 
 void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::string folderPrefix)

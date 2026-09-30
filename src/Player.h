@@ -5,9 +5,14 @@ struct Player
 	double y;
 	double width;
 	double height;
-
+	double left;
+	double right;
+	double top;
+	double bottom;
+	int lives;
 };
 
 void movePlayer(Player& player);
 Player initPlayer();
 void drawPlayer(Player player);
+void updatePlayer(Player& player);

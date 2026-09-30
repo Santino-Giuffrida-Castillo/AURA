@@ -23,7 +23,9 @@ struct VideoManager {
 };
 
 void playGame();
-void checkCollisions(Brick& brick, Ball& ball, Player& player);
+void checkPlayerLives(Player& player);
+void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player);
+void checkIfBallIsOut(Ball& ball, Player& player);
 void advanceFrameVideo(VideoMeme& video);
 void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::string folderPrefix);
 void playVideo(VideoMeme& video);
