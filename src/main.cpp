@@ -35,7 +35,7 @@ int main()
         drawPlayer(player);
         drawBall(ball);
         drawBricks(bricks, brickAmount);
-        
+        showCredits();
         slSetForeColor(0.0, 0.0, 0.0, 1.0);
         // Esta sola función de Game.cpp controla el Enter, el Tab, el audio y dibuja los frames
         /*controlAndDrawVideos(misVideos, width, height);*/

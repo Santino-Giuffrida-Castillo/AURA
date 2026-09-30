@@ -31,3 +31,4 @@ void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::s
 void playVideo(VideoMeme& video);
 void initVideoSystem(VideoManager& manager);
 void controlAndDrawVideos(VideoManager& manager, double width, double height);
+void showCredits();

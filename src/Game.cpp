@@ -46,6 +46,7 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
                             penetrationBottom = ball.top - bricks[i][j].bottom;
                                 if (penetrationLefth > penetrationRight)
                                 {
+
                                  minX = penetrationRight;
                                 }
                                 else
@@ -263,4 +264,11 @@ void controlAndDrawVideos(VideoManager& manager, double width, double height)
         slSetForeColor(1, 0, 0, 1);
         slRectangleFill(width * 0.5, height * 0.5, 100, 100);
     }
+}
+
+void showCredits()
+{
+    slSetFont(slLoadFont("res/stocky.ttf"), 20);
+    slSetForeColor(0.5, 0.5, 0.5, 1);
+    slText(100, 100, "Made by: Santino Giuffrida");
 }
