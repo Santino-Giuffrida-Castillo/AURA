@@ -35,6 +35,7 @@ Player initPlayer()
 	player.top = player.y + player.height / 2;
 	player.bottom = player.y + player.height / 2;
 	player.lives = 3;
+	player.isWinner = false;
 
 	return player;
 }

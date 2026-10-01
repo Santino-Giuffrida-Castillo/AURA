@@ -10,6 +10,7 @@ struct Player
 	double top;
 	double bottom;
 	int lives;
+	bool isWinner;
 };
 
 void movePlayer(Player& player);
