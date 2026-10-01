@@ -14,3 +14,17 @@ bool heartSkin[brickAmount][brickAmount] =
     {false, false, false, false, false, false, false, false, false, false}
 
 };
+bool cheatSkin[brickAmount][brickAmount] =
+{
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false}
+
+};
