@@ -119,15 +119,14 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
                                 bricks[i][j].active = false;
                                 collision = true;
 
-                                ball.left = ball.x - ball.width / 2;
-                                ball.right = ball.x + ball.width / 2;
-                                ball.bottom = ball.y - ball.height / 2;
-                                ball.top = ball.y + ball.height / 2;
+                                updateBall(ball);
                         }
                     }
             }
         }
     }
+
+
 
     if (ball.left < SCREEN_LEFTH)
     {
@@ -145,31 +144,149 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
         ball.velY *= -1;
     }
 
+
+
     if (ball.bottom <= player.top && ball.top >= player.bottom)
     {
+        //Se superpone en x?
         if (ball.left <= player.right && ball.right >= player.left)
         {
-            ball.y = player.top + ball.height / 2;
-            ball.velY *= -1;
+            std::cout << "choque con la paleta" << std::endl;
+            penetrationLefth = ball.right - player.left;
+            penetrationRight = player.right - ball.left;
+            penetrationTop = player.top - ball.bottom;
+            penetrationBottom = ball.top - player.bottom;
+            if (penetrationLefth > penetrationRight)
+            {
 
-            ball.bottom = ball.y - ball.height / 2;
-            ball.top = ball.y + ball.height / 2;
+                minX = penetrationRight;
+
+            }
+            else
+            {
+
+                minX = penetrationLefth;
+
+            }
+
+            if (penetrationTop < penetrationBottom)
+            {
+
+                minY = penetrationTop;
+
+            }
+
+            else
+            {
+
+                minY = penetrationBottom;
+
+            }
+
+
+            if (minX > minY)
+            {
+
+                    ball.y = player.top + ball.height / 2;
+                    ball.velY = -ball.velY;
+
+                    if (ball.x < ( player.left + (player.width / 3) ) )
+                    {
+                        ball.velX = -VELX_BALL;
+                    }
+                    else if (ball.x < ( player.left + (player.width / 3) * 2) )
+                    {
+                        ball.velX = 0;
+                    }
+                    else
+                    {
+                        ball.velX = VELX_BALL;
+                    }
+
+            }
+            else if (minX < minY)
+            {
+
+                if (ball.velX > 0)
+                {
+
+                    ball.x -= penetrationLefth;
+
+                }
+                else if (ball.velX < 0)
+                {
+
+                    ball.x += penetrationRight;
+
+                }
+
+                ball.velX = -ball.velX;
+            }
+            else
+            {
+                if (ball.velX > 0)
+                {
+
+                    ball.x -= penetrationLefth;
+
+                }
+                else if (ball.velX < 0)
+                {
+
+                    ball.x += penetrationRight;
+
+                }
+
+                if (ball.velY > 0)
+                {
+
+                    ball.y -= penetrationBottom;
+
+                }
+                else if (ball.velY < 0)
+                {
+
+                    ball.y += penetrationTop;
+
+                }
+
+                ball.velX *= -1;
+                ball.velY *= -1;
+            }
         }
     }
 
-    ball.left = ball.x - ball.width / 2;
-    ball.right = ball.x + ball.width / 2;
-    ball.bottom = ball.y - ball.height / 2;
-    ball.top = ball.y + ball.height / 2;
+   
+    updateBall(ball);
 
 
 }
 
-void checkPlayerLives(Player& player)
+void checkifPlayerLosedOrWined(Player& player, Brick bricks[brickAmount][brickAmount], int font)
 {
+    int bricksDestroyed = 0;
     if (player.lives == 0)
     {
         std::cout << "Perdiste" << std::endl;
+        showLoseScreen(font);
+
+    }
+
+    for (int i = 0; i < brickAmount; i++)
+    {
+        for (int j = 0; j < brickAmount; j++)
+        {
+            if (!bricks[i][j].active)
+            {
+                bricksDestroyed++;
+            }
+        }
+    }
+    if (bricksDestroyed == (brickAmount*brickAmount) && (!player.lives == 0))
+    {
+        std::cout << "Ganaste" << std::endl;
+        player.isWinner = true;
+        showWinScreen(font);
     }
 }
 
@@ -203,8 +320,8 @@ void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::s
 // Inicializa todos los videos juntos
 void initVideoSystem(VideoManager& manager)
 {
-    uploadVideo(manager.meme, 51, "res/BaraBaraBara.wav", "res/animacion_feliz/frame_");
-    uploadVideo(manager.intro, 174, "res/ianomenojocontigosolovservo.wav", "res/animacion_triste/intro_");
+    uploadVideo(manager.meme, 51, "../res/BaraBaraBara.wav", "res/animacion_feliz/frame_");
+    uploadVideo(manager.intro, 174, "../res/ianomenojocontigosolovservo.wav", "res/animacion_triste/intro_");
 }
 // Función interna para reproducir de forma segura
 void playVideo(VideoMeme& video) {
@@ -265,10 +382,23 @@ void controlAndDrawVideos(VideoManager& manager, double width, double height)
         slRectangleFill(width * 0.5, height * 0.5, 100, 100);
     }
 }
-
-void showCredits()
+void showLoseScreen(int font)
 {
-    slSetFont(slLoadFont("res/stocky.ttf"), 20);
+    slSetFont(font, 100);
     slSetForeColor(0.5, 0.5, 0.5, 1);
-    slText(100, 100, "Made by: Santino Giuffrida");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4), "PERDISTE");
+}
+void showWinScreen(int font)
+{
+    slSetFont(font, 100);
+    slSetForeColor(0.5, 0.5, 0.5, 1);
+    slText(100, (HEIGHT / 2 + HEIGHT / 4), "GANASTE");
+}
+
+void showCredits(int& font)
+{
+
+    slSetFont(font, 20);
+    slSetForeColor(0.5, 0.5, 0.5, 1);
+    slText(10, 10, "Made by: Santino Giuffrida");
 }
