@@ -24,8 +24,8 @@ void drawBall(Ball ball)
 }
 Ball initBall()
 {
-	float ang = (rand() % 36000) / 100;
-	float rad = ang * PI / 180;
+	double ang = (rand() % 120) + 30;
+	double rad = ang * PI / 180;
 
 	Ball ball;
 	ball.width = 10;
