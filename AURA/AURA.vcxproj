@@ -24,6 +24,7 @@
     <ClInclude Include="..\src\Consts.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Player.h" />
+    <ClInclude Include="..\src\Skins.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Ball.cpp" />

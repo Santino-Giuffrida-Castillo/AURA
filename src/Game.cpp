@@ -1,9 +1,50 @@
 #include "Game.h"
 #include <sl.h>
+#include "Skins.h"
 #include <iostream>
 void playGame()
 {
+    slWindow(WIDTH, HEIGHT, "Brick Breaker + Meme Player", false);
 
+    Player player;
+    Ball ball;
+    Brick bricks[brickAmount][brickAmount];
+    player = initPlayer();
+    ball = initBall();
+    fillRow(bricks);
+    putSkin(bricks, heartSkin);
+    int font = slLoadFont("../res/Canterbury.ttf");
+    int menuFont = slLoadFont("../res/stocky.ttf");
+
+    while (!slShouldClose() && !slGetKey(SL_KEY_ESCAPE))
+    {
+        // Fondo por defecto
+        slSetBackColor(0.0, 0.0, 1.0);
+
+
+        movePlayer(player);
+        moveBall(ball);
+        checkCollisions(bricks, ball, player);
+        checkIfBallIsOut(ball, player);
+        checkifPlayerLosedOrWined(player, bricks, menuFont);
+        if (!player.isWinner && player.lives > 0)
+        {
+            drawPlayer(player);
+            drawBall(ball);
+            drawBricks(bricks, brickAmount);
+        }
+        else
+        {
+            ball.velX = 0;
+            ball.velY = 0;
+        }
+        showCredits(font);
+        slSetForeColor(0.0, 0.0, 0.0, 1.0);
+
+        slRender();
+    }
+
+    slClose();
 }
 
 void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player)
