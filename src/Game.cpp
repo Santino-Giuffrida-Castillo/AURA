@@ -68,7 +68,7 @@ void playGame()
     putSkin(bricks, defaultSkin);
 
 
-    int font = slLoadFont("../res/stocky.ttf");
+    int font = slLoadFont("res/stocky.ttf");
     VideoManager manager;
     initVideoSystem(manager);
 
@@ -503,8 +503,8 @@ void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::s
 
 void initVideoSystem(VideoManager& manager)
 {
-    uploadVideo(manager.meme, 51, "../res/BaraBaraBara.wav", "../res/animacion_feliz/frame_");
-    uploadVideo(manager.intro, 174, "../res/ianomenojocontigosolovservo.wav", "../res/animacion_triste/intro_");
+    uploadVideo(manager.meme, 51, "res/BaraBaraBara.wav", "res/animacion_feliz/frame_");
+    uploadVideo(manager.intro, 174, "res/ianomenojocontigosolovservo.wav", "res/animacion_triste/intro_");
 }
 
 // Función para iniciar videos
