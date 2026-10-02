@@ -1,5 +1,6 @@
 #pragma once
 #include "Consts.h"
+#include "Skins.h"
 struct Brick
 {
 	double x;

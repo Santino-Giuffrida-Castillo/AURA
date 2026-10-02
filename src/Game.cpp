@@ -1,7 +1,48 @@
 #include "Game.h"
 #include <sl.h>
-#include "Skins.h"
 #include <iostream>
+bool defaultSkin[brickAmount][brickAmount] =
+{
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true},
+    {true, true, true, true, true, true, true, true, true, true}
+};
+bool heartSkin[brickAmount][brickAmount] =
+{
+    {false, false, true,  true,  false, false, true,  true,  false, false},
+    {false, true,  true,  true,  true,  true,  true,  true,  true,  false},
+    {true,  true,  true,  true,  true,  true,  true,  true,  true,  true },
+    {true,  true,  true,  true,  true,  true,  true,  true,  true,  true },
+    {false, true,  true,  true,  true,  true,  true,  true,  true,  false},
+    {false, false, true,  true,  true,  true,  true,  true,  false, false},
+    {false, false, false, true,  true,  true,  true,  false, false, false},
+    {false, false, false, false, true,  true,  false, false, false, false},
+    {false, false, false, false, false, false,  false, false, false, false},
+    {false, false, false, false, false, false, false, false, false, false}
+
+};
+bool cheatSkin[brickAmount][brickAmount] =
+{
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false},
+     {false, false, false,  false,  false, false, false,  false,  false, false},
+    {false, false, false,  false,  false, false, false,  false,  false, false}
+
+};
+
 void playGame()
 {
     slWindow(WIDTH, HEIGHT, "Brick Breaker + Meme Player", false);
@@ -9,37 +50,134 @@ void playGame()
     Player player;
     Ball ball;
     Brick bricks[brickAmount][brickAmount];
+    bool actualSkin[brickAmount][brickAmount];
+    GameMode mode = NORMAL;
+    bool destroyedBrick = false;
+
+    for (int i = 0; i < brickAmount; i++)
+    {
+        for (int j = 0; j < brickAmount; j++)
+        {
+            actualSkin[i][j] = defaultSkin[i][j];
+        }
+    }
+
     player = initPlayer();
     ball = initBall();
     fillRow(bricks);
-    putSkin(bricks, heartSkin);
-    int font = slLoadFont("../res/Canterbury.ttf");
-    int menuFont = slLoadFont("../res/stocky.ttf");
+    putSkin(bricks, defaultSkin);
+
+
+    int font = slLoadFont("../res/stocky.ttf");
+    VideoManager manager;
+    initVideoSystem(manager);
+
+    GameState state = MODE_MENU;
 
     while (!slShouldClose() && !slGetKey(SL_KEY_ESCAPE))
     {
-        // Fondo por defecto
         slSetBackColor(0.0, 0.0, 1.0);
 
-
-        movePlayer(player);
-        moveBall(ball);
-        checkCollisions(bricks, ball, player);
-        checkIfBallIsOut(ball, player);
-        checkifPlayerLosedOrWined(player, bricks, menuFont);
-        if (!player.isWinner && player.lives > 0)
+        if (state == PLAYING)
         {
+            slSetForeColor(1.0, 1.0, 1.0, 1.0);
+            movePlayer(player);
+            moveBall(ball);
+
+            checkCollisions(bricks, ball, player, destroyedBrick);
+            checkIfBallIsOut(ball, player);
+
+            checkifPlayerLosedOrWon(player, bricks, state);
+
             drawPlayer(player);
             drawBall(ball);
             drawBricks(bricks, brickAmount);
+
+            if (mode == ESPECIAL)
+            {
+                controlAndDrawSpecialMode(manager, destroyedBrick, WIDTH, HEIGHT);
+            }
         }
-        else
+
+        else if (state == LOSE_SCREEN)
         {
-            ball.velX = 0;
-            ball.velY = 0;
+            slSetForeColor(0.5, 0.5, 0.5, 1);
+            showLoseScreen(font);
+
+            if (slGetKey(SL_KEY_ENTER))
+            {
+                initGame(player, bricks, ball, actualSkin);
+                state = PLAYING;
+            }
+            else if (slGetKey('R') || slGetKey('r'))
+            {
+                state = SKIN_MENU;
+            }
+            else if (slGetKey('Q') || slGetKey('q'))
+            {
+                state = MODE_MENU;
+            }
+            else if (slGetKey('C') || slGetKey('c'))
+            {
+                state = CREDITS;
+            }
         }
-        showCredits(font);
-        slSetForeColor(0.0, 0.0, 0.0, 1.0);
+
+        else if (state == WIN_SCREEN)
+        {
+            slSetForeColor(0.5, 0.5, 0.5, 1);
+            showWinScreen(font);
+
+            if (slGetKey(SL_KEY_ENTER))
+            {
+                initGame(player, bricks, ball, actualSkin);
+                state = PLAYING;
+            }
+            else if (slGetKey('R') || slGetKey('r'))
+            {
+                state = SKIN_MENU;
+            }
+            else if (slGetKey('Q') || slGetKey('q'))
+            {
+                state = MODE_MENU;
+            }
+            else if (slGetKey('C') || slGetKey('c'))
+            {
+                state = CREDITS;
+            }
+        }
+
+        else if (state == CREDITS)
+        {
+            showCredits(font);
+
+            if (slGetKey('f') || slGetKey('F'))
+            {
+                state = LOSE_SCREEN;
+            }
+        }
+
+        else if (state == SKIN_MENU)
+        {
+            choseSkin(actualSkin, font);
+
+            if (slGetKey(SL_KEY_ENTER))
+            {
+                initGame(player, bricks, ball, actualSkin);
+                putSkin(bricks, actualSkin);
+                state = PLAYING;
+            }
+        }
+
+        else if (state == MODE_MENU)
+        {
+            choseMode(mode, font);
+
+            if (slGetKey(SL_KEY_ENTER))
+            {
+                state = PLAYING;
+            }
+        }
 
         slRender();
     }
@@ -47,8 +185,9 @@ void playGame()
     slClose();
 }
 
-void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player)
+void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player, bool& destroyedBrick)
 {
+    destroyedBrick = false;
     bool collision = false;
     bool touchUp = false;
     bool tochDown = false;
@@ -62,9 +201,10 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
     double penetrationBottom;
     double minX;
     double minY;
-
+    
     for (int i = 0; i < brickAmount; i++)
     {
+       
         if (collision)
         {
             break;
@@ -159,7 +299,7 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
 
                                 bricks[i][j].active = false;
                                 collision = true;
-
+                                destroyedBrick = true;
                                 updateBall(ball);
                         }
                     }
@@ -303,15 +443,15 @@ void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player&
 
 }
 
-void checkifPlayerLosedOrWined(Player& player, Brick bricks[brickAmount][brickAmount], int font)
+void checkifPlayerLosedOrWon( Player& player,Brick bricks[brickAmount][brickAmount],GameState& state)
 {
-    int bricksDestroyed = 0;
-    if (player.lives == 0)
+    if (player.lives <= 0)
     {
-        std::cout << "Perdiste" << std::endl;
-        showLoseScreen(font);
-
+        state = LOSE_SCREEN;
+        return;
     }
+
+    int bricksDestroyed = 0;
 
     for (int i = 0; i < brickAmount; i++)
     {
@@ -323,11 +463,11 @@ void checkifPlayerLosedOrWined(Player& player, Brick bricks[brickAmount][brickAm
             }
         }
     }
-    if (bricksDestroyed == (brickAmount*brickAmount) && (!player.lives == 0))
+
+    if (bricksDestroyed == brickAmount * brickAmount)
     {
-        std::cout << "Ganaste" << std::endl;
         player.isWinner = true;
-        showWinScreen(font);
+        state = WIN_SCREEN;
     }
 }
 
@@ -351,6 +491,7 @@ void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::s
         std::string ceros = "";
 
 // Formato exacto de 5 dígitos (ej: frame_00001 a frame_00010)
+
         if (numeroFrame < 10) ceros = "0000";         // 4 ceros + 1 dígito = 5 dígitos
         else if (numeroFrame < 100) ceros = "000";     // 3 ceros + 2 dígitos = 5 dígitos
         else if (numeroFrame < 1000) ceros = "00";     // 2 ceros + 3 dígitos = 5 dígitos
@@ -359,87 +500,232 @@ void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::s
     }
 }
 // Inicializa todos los videos juntos
+
 void initVideoSystem(VideoManager& manager)
 {
-    uploadVideo(manager.meme, 51, "../res/BaraBaraBara.wav", "res/animacion_feliz/frame_");
-    uploadVideo(manager.intro, 174, "../res/ianomenojocontigosolovservo.wav", "res/animacion_triste/intro_");
+    uploadVideo(manager.meme, 51, "../res/BaraBaraBara.wav", "../res/animacion_feliz/frame_");
+    uploadVideo(manager.intro, 174, "../res/ianomenojocontigosolovservo.wav", "../res/animacion_triste/intro_");
 }
-// Función interna para reproducir de forma segura
-void playVideo(VideoMeme& video) {
-    if (!video.playing) {
+
+// Función para iniciar videos
+
+void playVideo(VideoMeme& video)
+{
+    if (!video.playing)
+    {
         slSoundPlay(video.sound);
+
         video.playing = true;
         video.actualFrame = 0;
         video.timeCounter = 0;
+        video.elapsedTime = 0.0;
     }
 }
-// Función interna para actualizar fotogramas
-void advanceFrameVideo(VideoMeme& video) {
-    if (!video.playing) return;
-    video.timeCounter++;
-    if (video.timeCounter % 6 == 0) {
-        video.actualFrame++;
-        if (video.actualFrame >= video.realCantFrames) {
-            video.playing = false;
-        }
-    }
-}
-// LA FUNCIÓN MAESTRA: Se encarga de capturar teclas, actualizar lógica y dibujar
-void controlAndDrawVideos(VideoManager& manager, double width, double height)
+//Funcion para parar videos
+
+void stopVideo(VideoMeme& video)
 {
-    // 1. GESTIÓN DE ENTRADAS DE TECLADO
-    if (slGetKey(SL_KEY_ENTER)) {
-        if (!manager.enterPressedBefore && !manager.intro.playing) {
-            playVideo(manager.meme);
-            manager.enterPressedBefore = true;
-        }
-    }
-    else {
-        manager.enterPressedBefore = false;
-    }
+    if (video.playing)
+    {
+        slSoundStop(video.sound);
 
-    if (slGetKey(SL_KEY_TAB)) {
-        if (!manager.tabPressedBefore && !manager.meme.playing) {
-            playVideo(manager.intro);
-            manager.tabPressedBefore = true;
-        }
-    }
-    else {
-        manager.tabPressedBefore = false;
-    }
-
-    // 2. ACTUALIZACIÓN Y DIBUJADO SEGÚN PRIORIDAD
-    if (manager.intro.playing) {
-        slSprite(manager.intro.fotograms[manager.intro.actualFrame], width * 0.5, height * 0.5, 800, 600);
-        advanceFrameVideo(manager.intro);
-    }
-    else if (manager.meme.playing) {
-        slSprite(manager.meme.fotograms[manager.meme.actualFrame], width * 0.5, height * 0.5, 800, 600);
-        advanceFrameVideo(manager.meme);
-    }
-    else {
-        // Interfaz base o elementos por defecto del juego si no hay ningún video activo
-        slSetForeColor(1, 0, 0, 1);
-        slRectangleFill(width * 0.5, height * 0.5, 100, 100);
+        video.playing = false;
+        video.actualFrame = 0;
+        video.timeCounter = 0;
+        video.elapsedTime = 0.0;
     }
 }
+
+//Cambia los fotogramas 
+void advanceFrameVideo(VideoMeme& video)
+{
+    if (!video.playing) return;
+
+    video.elapsedTime += slGetDeltaTime();
+
+    video.timeCounter++;
+
+    if (video.timeCounter % 6 == 0)
+    {
+        video.actualFrame++;
+    }
+
+    double duration = video.realCantFrames / 10.0;
+
+    if (video.elapsedTime >= duration)
+    {
+        slSoundStop(video.sound);
+
+        video.playing = false;
+        video.actualFrame = 0;
+        video.timeCounter = 0;
+        video.elapsedTime = 0.0;
+    }
+}
+// Funcion encargada de controlar los videos 
+void controlAndDrawSpecialMode(VideoManager& manager, bool destroyedBrick, double width, double height)
+{
+    // Si está sonando el feliz, tiene prioridad absoluta.
+    // Los bloques que destruya mientras tanto se ignoran.
+    if (manager.meme.playing)
+    {
+        slSetForeColor(1.0, 1.0, 1.0, 1.0);
+
+        slSprite(
+            manager.meme.fotograms[manager.meme.actualFrame],
+            25,
+            25,
+            50,
+            50
+        );
+
+        advanceFrameVideo(manager.meme);
+
+        return;
+    }
+
+    // Si acaba de destruir un bloque y NO está sonando el feliz:
+    // cortamos el triste y ponemos el feliz.
+    if (destroyedBrick)
+    {
+        stopVideo(manager.intro);
+        playVideo(manager.meme);
+
+        return;
+    }
+
+    // Si no destruyó ningún bloque y está sonando el triste,
+    // simplemente seguimos reproduciéndolo.
+    if (manager.intro.playing)
+    {
+        slSetForeColor(1.0, 1.0, 1.0, 1.0);
+
+        slSprite(
+            manager.intro.fotograms[manager.intro.actualFrame],
+            25,
+            25,
+            50,
+            50
+        );
+
+        advanceFrameVideo(manager.intro);
+
+        return;
+    }
+
+    // Si no está sonando ninguno, empieza el triste.
+    playVideo(manager.intro);
+}
+
 void showLoseScreen(int font)
 {
     slSetFont(font, 100);
     slSetForeColor(0.5, 0.5, 0.5, 1);
     slText(100, (HEIGHT / 2 + HEIGHT / 4), "PERDISTE");
+    slSetFont(font, 50);
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 50, "Resetear?(ENTER)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 100, "Cambiar skin?(R)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 150, "Cambiar Modo?(Q)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 200, "Mostrar Creditos?(C)");
 }
+
 void showWinScreen(int font)
 {
     slSetFont(font, 100);
     slSetForeColor(0.5, 0.5, 0.5, 1);
     slText(100, (HEIGHT / 2 + HEIGHT / 4), "GANASTE");
+    slSetFont(font, 50);
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 50, "Resetear?(ENTER)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 100, "Cambiar skin?(R)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 150, "Cambiar Modo?(Q)");
+    slText(100, (HEIGHT / 2 + HEIGHT / 4) - 200, "Mostrar Creditos?(C)");
+
 }
 
 void showCredits(int& font)
 {
 
-    slSetFont(font, 20);
-    slSetForeColor(0.5, 0.5, 0.5, 1);
-    slText(10, 10, "Made by: Santino Giuffrida");
+        slSetFont(font, 20);
+        slSetForeColor(0.5, 0.5, 0.5, 1);
+        slText(5, 500, "Hecho por: Santino Giuffrida");
+        slText(5, 450, "Para el desarrollo de este juego se uso:ChatGPT");
+        slText(5, 400, "modelo GPT - 5.6 Luna, de OpenAI, en la busqueda de informacion y");
+        slText(5, 350, "ayuda en la correccion de errores, se uso mas en la implementacion de");
+        slText(5, 300, "material audiovisual(funciones para implementarlo en el juego)");
+        slSetFont(font, 30);
+        slText(100, 250, "Agradecimientos especiales");
+        slSetFont(font, 20);
+        slText(5, 220, "Nahuel Suarez: Aporte en solucionar errores y apoyo emocional");
+        slText(5, 200, "Sofia Belen Alvarez Franze:Aporte en la idea de como hacer el mapa");
+        slText(5, 150, "Lucio Stefano Piccioni:Aporte en la idea de como hacer el mapa");
+        slText(5, 100, "Aprete F para salir");
+    
+}
+
+void initGame(Player& player, Brick bricks[brickAmount][brickAmount], Ball& ball, bool skin[brickAmount][brickAmount])
+{
+    player = initPlayer();
+    fillRow(bricks);
+    putSkin(bricks, skin);
+    ball = initBall();
+}
+
+void choseSkin(bool skin[brickAmount][brickAmount], int font)
+{
+    slSetFont(font, 40);
+
+    slSetForeColor(1, 1, 1, 1);
+
+    slText(100, 700, "ELEGIR SKIN");
+
+    slSetFont(font, 25);
+
+    slText(100, 500, "1 - Corazon");
+    slText(100, 450, "2 - Default");
+    slText(100, 400, "ENTER - Confirmar");
+
+    if (slGetKey('1'))
+    {
+        for (int i = 0; i < brickAmount; i++)
+        {
+            for (int j = 0; j < brickAmount; j++)
+            {
+                skin[i][j] = heartSkin[i][j];
+            }
+        }
+    }
+
+    if (slGetKey('2'))
+    {
+        for (int i = 0; i < brickAmount; i++)
+        {
+            for (int j = 0; j < brickAmount; j++)
+            {
+                skin[i][j] = defaultSkin[i][j];
+            }
+        }
+    }
+}
+void choseMode(GameMode& mode, int font)
+{
+    slSetFont(font, 40);
+    slSetForeColor(1, 1, 1, 1);
+
+    slText(100, 550, "ELEGIR MODO");
+
+    slSetFont(font, 25);
+
+    slText(100, 400, "1 - Normal");
+    slText(100, 350, "2 - Especial");
+    slText(100, 250, "ENTER - Confirmar");
+
+    if (slGetKey('1'))
+    {
+        mode = NORMAL;
+    }
+
+    if (slGetKey('2'))
+    {
+        mode = ESPECIAL;
+    }
 }

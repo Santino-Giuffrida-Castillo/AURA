@@ -5,11 +5,11 @@ void movePlayer(Player& player)
 {
 	if (slGetKey('a') || slGetKey('A'))
 	{
-		player.x -= 200 * slGetDeltaTime();
+		player.x -= 300 * slGetDeltaTime();
 	}
 	else if (slGetKey('D') || slGetKey('D'))
 	{
-		player.x += 200 * slGetDeltaTime();
+		player.x += 300 * slGetDeltaTime();
 	}
 
 	if (player.x < SCREEN_LEFTH + player.width / 2)

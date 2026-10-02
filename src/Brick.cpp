@@ -115,3 +115,4 @@ void drawBricks(Brick bricks[brickAmount][brickAmount], int brickAmount)
 	}
 	
 }
+

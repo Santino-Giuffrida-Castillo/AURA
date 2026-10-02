@@ -6,6 +6,23 @@
 #include <string>
 
 const int MAX_FOTOGRAMS = 200;
+
+enum GameState
+{
+    PLAYING,
+    LOSE_SCREEN,
+    WIN_SCREEN,
+    CREDITS,
+    SKIN_MENU,
+    MODE_MENU
+};
+
+enum GameMode
+{
+    NORMAL,
+    ESPECIAL
+};
+
 struct VideoMeme {
     int sound;
     int fotograms[MAX_FOTOGRAMS];
@@ -13,24 +30,34 @@ struct VideoMeme {
     bool playing = false;
     int actualFrame = 0;
     int timeCounter = 0;
+    double elapsedTime = 0.0;
 };
 
 struct VideoManager {
     VideoMeme meme;
     VideoMeme intro;
-    bool enterPressedBefore = false;
-    bool tabPressedBefore = false;
+    double waitTime = 0.0;
 };
 
 void playGame();
+
 void showLoseScreen(int font);
 void showWinScreen(int font);
-void checkifPlayerLosedOrWined(Player& player, Brick bricks[brickAmount][brickAmount], int font);
-void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player);
+void checkifPlayerLosedOrWon(Player& player, Brick bricks[brickAmount][brickAmount], GameState& state);
+
+void initGame(Player& player, Brick bricks[brickAmount][brickAmount], Ball& ball, bool skin[brickAmount][brickAmount]);
+
+void checkCollisions(Brick bricks[brickAmount][brickAmount], Ball& ball, Player& player, bool& destroyedBrick);
 void checkIfBallIsOut(Ball& ball, Player& player);
+
 void advanceFrameVideo(VideoMeme& video);
 void uploadVideo(VideoMeme& video, int cantFrames, std::string audioRute, std::string folderPrefix);
 void playVideo(VideoMeme& video);
+void stopVideo(VideoMeme& video);
 void initVideoSystem(VideoManager& manager);
-void controlAndDrawVideos(VideoManager& manager, double width, double height);
+void controlAndDrawSpecialMode(VideoManager& manager, bool destroyedBrick, double width, double height);
+
+
 void showCredits(int& font);
+void choseSkin(bool skin[brickAmount][brickAmount], int font);
+void choseMode(GameMode& mode, int font);
